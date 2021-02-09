@@ -14,7 +14,7 @@ const toError = (detail, status = 500, title = 'Server Error') => ({
   ],
 });
 
-const failure = (res, detail, status = 500) => res.status(status).json(toError(detail));
+const failure = (res, detail, status = 500) => res.status(status).json(toError(detail, status));
 
 module.exports = {
   success,

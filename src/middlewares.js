@@ -1,4 +1,4 @@
-const { toError } = require('./utils/router.utils');
+const { failure } = require('./utils/router.utils');
 
 const parseIntParam = (key = 'id') => (req, res, next) => {
   if (req.params[key]) {
@@ -19,7 +19,7 @@ const parseIntParam = (key = 'id') => (req, res, next) => {
 const errorHandler = (err, req, res, next) => {
   if (err instanceof Error) {
     // TODO: create custom errors that hold status codes and better error descriptions
-    res.json(toError(err.message)).status(500);
+    failure(res, err.message);
     return next();
   }
 
