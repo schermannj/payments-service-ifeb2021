@@ -17,6 +17,7 @@
     "pino-http": "^5.5.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^7.19.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1"
