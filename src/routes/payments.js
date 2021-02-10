@@ -1,22 +1,27 @@
 const router = require('express').Router();
+const { sumBy } = require('lodash/fp');
 const db = require('../db');
 const payments = require('../services/payments.service')(db);
 const { success, failure } = require('../utils/router.utils');
-const { parseIntParam } = require('../middlewares');
+const { parseIntParam, parseDateQueryParams, parseIntQueryParams } = require('../middlewares');
 
 const NAMESPACE = '/payments';
 
-const list = async (req, res) => {
+const list = async ({ query }, res) => {
   try {
-    const data = await payments.list();
+    const data = await payments.list(
+      query.contractId, query.startDate, query.endDate,
+    );
 
-    success(res, data);
+    const rentTotal = sumBy('value', data);
+
+    success(res, { sum: rentTotal, items: data });
   } catch (e) {
     failure(res, e.title, e.detail, e.statusCode);
   }
 };
 
-const get = async ({ params: { id } }, res) => {
+const getOne = async ({ params: { id } }, res) => {
   try {
     const data = await payments.get(id);
 
@@ -58,8 +63,13 @@ const remove = async ({ params: { id } }, res) => {
   }
 };
 
-router.get(NAMESPACE, list);
-router.get(`${NAMESPACE}/:id`, parseIntParam('id'), get);
+router.get(
+  NAMESPACE,
+  parseIntQueryParams(['contractId']),
+  parseDateQueryParams(['startDate', 'endDate']),
+  list,
+);
+router.get(`${NAMESPACE}/:id`, parseIntParam('id'), getOne);
 router.post(NAMESPACE, create);
 router.patch(`/${NAMESPACE}/:id`, parseIntParam('id'), update);
 router.delete(`/${NAMESPACE}/:id`, parseIntParam('id'), remove);
@@ -68,7 +78,7 @@ module.exports = {
   router,
   api: {
     list,
-    get,
+    getOne,
     create,
     update,
     remove,

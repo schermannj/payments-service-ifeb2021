@@ -9,7 +9,9 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "express": "~4.16.1",
+    "lodash": "^4.17.20",
     "lokijs": "^1.5.11",
+    "moment": "^2.29.1",
     "pino": "^6.11.0",
     "pino-http": "^5.5.0"
   },

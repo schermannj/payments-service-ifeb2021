@@ -1,21 +1,32 @@
 const { failure } = require('./utils/router.utils');
-const { PaymentServiceError, ClientError } = require('./errors');
+const { strToInt, strToDate } = require('./utils/parsing.utils');
+const { PaymentServiceError } = require('./errors');
 
 const parseIntParam = (key = 'id') => (req, res, next) => {
   if (req.params[key]) {
     try {
-      const value = parseInt(req.params[key], 10);
-
-      if (Number.isNaN(value)) {
-        throw new ClientError(
-          `Invalid value for ${key}`,
-        );
-      }
-
-      req.params[key] = value;
+      req.params[key] = strToInt(req.params[key]);
     } catch (e) {
       next(e);
     }
+  }
+
+  next();
+};
+
+const parseQueryParams = (parserFn) => (keys) => (req, res, next) => {
+  if (!keys) {
+    throw new Error(
+      'Middleware is not properly configured',
+    );
+  }
+
+  for (const key of keys) {
+    const value = req.query[key];
+
+    if (!value) continue;
+
+    req.query[key] = parserFn(value);
   }
 
   next();
@@ -38,4 +49,6 @@ const errorHandler = (err, req, res, next) => {
 module.exports = {
   parseIntParam,
   errorHandler,
+  parseIntQueryParams: parseQueryParams(strToInt),
+  parseDateQueryParams: parseQueryParams(strToDate),
 };
