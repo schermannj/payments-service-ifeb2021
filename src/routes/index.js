@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { router: paymentsRouter } = require('./payments');
+const { router: paymentsRouter } = require('./payments.routes');
 
 const NAMESPACE = '/api';
 

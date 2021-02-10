@@ -1,6 +1,10 @@
 const moment = require('moment');
-const { omitBy, isNil } = require('lodash/fp');
+const {
+  map, omit, omitBy, isNil,
+} = require('lodash/fp');
 const { ClientError } = require('../errors');
+
+const sanitizeResponse = omit(['meta', '$loki']);
 
 class PaymentsService {
   /**
@@ -22,7 +26,7 @@ class PaymentsService {
       throw new ClientError(`No payments found with id = ${id}`);
     }
 
-    return response[0];
+    return sanitizeResponse(response[0]);
   }
 
   /**
@@ -41,12 +45,14 @@ class PaymentsService {
     // this does not look like a great solution, but with this
     // stupid in-memory database it's kinda complex
     // and I don't want to spend a ton of time on a thing like this.
-    return this.db.payments.where((it) => (
+    const response = this.db.payments.where((it) => (
       it.contractId === contractId
         && !it.isDeleted
         && (startDate ? moment(it.time) >= startDate : true)
         && (endDate ? moment(it.time) < endDate : true)
     ));
+
+    return map((it) => sanitizeResponse(it), response);
   }
 
   /**
@@ -56,11 +62,13 @@ class PaymentsService {
    * @returns payment
    */
   create(payment) {
-    return this.db.payments.insert({
+    const response = this.db.payments.insert({
       ...payment,
       isImported: false,
       isDeleted: false,
     });
+
+    return sanitizeResponse(response);
   }
 
   /**
@@ -84,7 +92,9 @@ class PaymentsService {
 
     Object.assign(item, updatePayload);
 
-    return this.db.payments.update(item);
+    const response = this.db.payments.update(item);
+
+    return sanitizeResponse(response);
   }
 
   /**
@@ -94,7 +104,9 @@ class PaymentsService {
    * @returns {*}
    */
   remove(id) {
-    return this.update(id, { isDeleted: true });
+    const response = this.update(id, { isDeleted: true });
+
+    return sanitizeResponse(response);
   }
 }
 
