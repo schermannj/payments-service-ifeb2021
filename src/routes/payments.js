@@ -12,7 +12,7 @@ const list = async (req, res) => {
 
     success(res, data);
   } catch (e) {
-    failure(res, e.message);
+    failure(res, e.title, e.detail, e.statusCode);
   }
 };
 
@@ -20,13 +20,9 @@ const get = async ({ params: { id } }, res) => {
   try {
     const data = await payments.get(id);
 
-    if (data?.length === 0) {
-      return failure(res, `No payments found with id = ${id}`, 404);
-    }
-
-    return success(res, data);
+    success(res, data);
   } catch (e) {
-    return failure(res, e.message);
+    failure(res, e.title, e.detail, e.statusCode);
   }
 };
 
@@ -37,7 +33,7 @@ const create = async (req, res) => {
 
     success(res, data);
   } catch (e) {
-    failure(res, e.message);
+    failure(res, e.title, e.detail, e.statusCode);
   }
 };
 
@@ -48,7 +44,7 @@ const update = async ({ params: { id }, body }, res) => {
 
     success(res, data);
   } catch (e) {
-    failure(res, e.message);
+    failure(res, e.title, e.detail, e.statusCode);
   }
 };
 
@@ -58,7 +54,7 @@ const remove = async ({ params: { id } }, res) => {
 
     success(res);
   } catch (e) {
-    failure(res, e.message);
+    failure(res, e.title, e.detail, e.statusCode);
   }
 };
 
@@ -68,4 +64,13 @@ router.post(NAMESPACE, create);
 router.patch(`/${NAMESPACE}/:id`, parseIntParam('id'), update);
 router.delete(`/${NAMESPACE}/:id`, parseIntParam('id'), remove);
 
-module.exports = router;
+module.exports = {
+  router,
+  api: {
+    list,
+    get,
+    create,
+    update,
+    remove,
+  },
+};

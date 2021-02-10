@@ -4,7 +4,7 @@ const success = (res, data) => {
   return res.status(200).json(data);
 };
 
-const toError = (detail, status = 500, title = 'Server Error') => ({
+const toError = (title, detail, status = 500) => ({
   errors: [
     {
       status,
@@ -14,7 +14,8 @@ const toError = (detail, status = 500, title = 'Server Error') => ({
   ],
 });
 
-const failure = (res, detail, status = 500) => res.status(status).json(toError(detail, status));
+const failure = (res, title, detail, status = 500) => res.status(status)
+  .json(toError(title, detail, status));
 
 module.exports = {
   success,

@@ -1,3 +1,5 @@
+const { ClientError } = require('../errors');
+
 class PaymentsService {
   constructor(db) {
     /**
@@ -7,7 +9,13 @@ class PaymentsService {
   }
 
   get(id) {
-    return this.db.payments.find({ id });
+    const response = this.db.payments.find({ id });
+
+    if (!response.length) {
+      throw new ClientError(`No payments found with id = ${id}`);
+    }
+
+    return response[0];
   }
 
   list() {
