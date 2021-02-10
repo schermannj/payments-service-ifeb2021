@@ -1,16 +1,16 @@
 # Payment Service
 
-##Description
+## Description
 A payment micro-service example, exposes CRUD API to manage payments.
 
 
-##Installation
+## Installation
 
 ```
 yarn
 ```
 
-##Run
+## Run
 
 ```
 yarn start
