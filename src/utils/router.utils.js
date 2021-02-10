@@ -1,8 +1,4 @@
-const success = (res, data) => {
-  if (!data) return res.status(200);
-
-  return res.status(200).json(data);
-};
+const success = (res, data) => res.status(200).json(data || {});
 
 const toError = (title, detail, status = 500) => ({
   errors: [

@@ -1,6 +1,6 @@
 const { failure } = require('./utils/router.utils');
 const { strToInt, strToDate } = require('./utils/parsing.utils');
-const { PaymentServiceError } = require('./errors');
+const { PaymentServiceError, ClientError } = require('./errors');
 
 const parseIntParam = (key = 'id') => (req, res, next) => {
   if (req.params[key]) {
@@ -32,6 +32,16 @@ const parseQueryParams = (parserFn) => (keys) => (req, res, next) => {
   next();
 };
 
+const validateBodyWithSchema = (schema) => (req, res, next) => {
+  const response = schema.validate(req.body);
+
+  if (response.error) {
+    throw new ClientError(response.error.message);
+  }
+
+  next();
+};
+
 const errorHandler = (err, req, res, next) => {
   if (err instanceof PaymentServiceError) {
     failure(res, err.title, err.detail, err.statusCode);
@@ -51,4 +61,5 @@ module.exports = {
   errorHandler,
   parseIntQueryParams: parseQueryParams(strToInt),
   parseDateQueryParams: parseQueryParams(strToDate),
+  validateBodyWithSchema,
 };

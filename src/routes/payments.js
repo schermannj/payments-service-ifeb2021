@@ -3,7 +3,10 @@ const { sumBy } = require('lodash/fp');
 const db = require('../db');
 const payments = require('../services/payments.service')(db);
 const { success, failure } = require('../utils/router.utils');
-const { parseIntParam, parseDateQueryParams, parseIntQueryParams } = require('../middlewares');
+const {
+  parseIntParam, parseDateQueryParams, parseIntQueryParams, validateBodyWithSchema,
+} = require('../middlewares');
+const { paymentUpdateSchema, paymentCreateSchema } = require('./schemas/payment.schemas');
 
 const NAMESPACE = '/payments';
 
@@ -33,7 +36,6 @@ const getOne = async ({ params: { id } }, res) => {
 
 const create = async (req, res) => {
   try {
-    // TODO: joi schema
     const data = payments.create(req.body);
 
     success(res, data);
@@ -44,7 +46,6 @@ const create = async (req, res) => {
 
 const update = async ({ params: { id }, body }, res) => {
   try {
-    // TODO: joi schema
     const data = await payments.update(id, body);
 
     success(res, data);
@@ -70,9 +71,14 @@ router.get(
   list,
 );
 router.get(`${NAMESPACE}/:id`, parseIntParam('id'), getOne);
-router.post(NAMESPACE, create);
-router.patch(`/${NAMESPACE}/:id`, parseIntParam('id'), update);
-router.delete(`/${NAMESPACE}/:id`, parseIntParam('id'), remove);
+router.post(NAMESPACE, validateBodyWithSchema(paymentCreateSchema), create);
+router.patch(
+  `${NAMESPACE}/:id`,
+  parseIntParam('id'),
+  validateBodyWithSchema(paymentUpdateSchema),
+  update,
+);
+router.delete(`${NAMESPACE}/:id`, parseIntParam('id'), remove);
 
 module.exports = {
   router,

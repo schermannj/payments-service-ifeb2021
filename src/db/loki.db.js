@@ -4,9 +4,11 @@ const db = new Loki('payments.db');
 
 const payments = db.addCollection('payments');
 
+// autoincrement id
+payments.on('insert', (input) => Object.assign(input, { id: input.$loki }));
+
 if (!payments.data.length) {
   payments.insert({
-    id: 1366,
     contractId: 17689,
     description: 'Rent payment',
     value: 101,
@@ -17,7 +19,6 @@ if (!payments.data.length) {
     isDeleted: false,
   });
   payments.insert({
-    id: 1365,
     contractId: 17689,
     description: 'Rent to be paid',
     value: -100,

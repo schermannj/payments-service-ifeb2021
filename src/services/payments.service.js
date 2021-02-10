@@ -1,14 +1,20 @@
 const moment = require('moment');
+const { omitBy, isNil } = require('lodash/fp');
 const { ClientError } = require('../errors');
 
 class PaymentsService {
+  /**
+   * The db object have to support mongo-like interface
+   */
   constructor(db) {
-    /**
-     * The db object have to support mongo-like interface
-     */
     this.db = db;
   }
 
+  /**
+   * Returns a single payment item if it exists, otherwise fails.
+   *
+   * @param id - int value
+   */
   get(id) {
     const response = this.db.payments.find({ id, isDeleted: false });
 
@@ -19,6 +25,14 @@ class PaymentsService {
     return response[0];
   }
 
+  /**
+   * Returns list of payment items by contractId - if contract id is not supplied - fails.
+   * The method exposes functionality to filter result by startDate and endDate.
+   *
+   * @param contractId - int, id of the rent contract
+   * @param startDate - Date, start date of the rent contract
+   * @param endDate - Date, end date of the rent contract
+   */
   list(contractId, startDate, endDate) {
     if (!contractId) {
       throw new ClientError('contractId is a required query parameter');
@@ -35,24 +49,48 @@ class PaymentsService {
     ));
   }
 
+  /**
+   * Creates a payment item.
+   *
+   * @param payment - {contractId, description, value, time}
+   * @returns payment
+   */
   create(payment) {
     return this.db.payments.insert(payment);
   }
 
+  /**
+   * Updates a payment by id.
+   *
+   * @param id - int, payment id
+   * @param description - str, payment description
+   * @param value - number, payment value
+   * @param time - ISO date str, time of the payment
+   * @param isDeleted - bool, is used for paranoid delete
+   * @returns {*}
+   */
   update(id, {
     description, value, time, isDeleted = false,
   }) {
     const item = this.get(id);
 
-    Object.assign(item, {
+    const updatePayload = omitBy(isNil, {
       description, value, time, updatedAt: new Date().toISOString(), isDeleted,
     });
+
+    Object.assign(item, updatePayload);
 
     return this.db.payments.update(item);
   }
 
+  /**
+   * Deletes a payment by id.
+   *
+   * @param id - int, payment id
+   * @returns {*}
+   */
   remove(id) {
-    this.update(id, { isDeleted: true });
+    return this.update(id, { isDeleted: true });
   }
 }
 

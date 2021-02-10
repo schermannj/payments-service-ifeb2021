@@ -9,6 +9,7 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "express": "~4.16.1",
+    "joi": "^17.4.0",
     "lodash": "^4.17.20",
     "lokijs": "^1.5.11",
     "moment": "^2.29.1",
