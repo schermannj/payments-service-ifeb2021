@@ -38,7 +38,7 @@ Example: /api/payments/1
 ```
 GET: /api/payments?contractId=:contractId&startDate=:startDate&endDate=:endDate
 
-Example: /api/payments?contractId=1&endDate=2016-12-09T01:50:59
+Example: /api/payments?contractId=17689&endDate=2016-12-09T01:50:59
 ```
 
 Note, only contractId is required, everything else is optional.

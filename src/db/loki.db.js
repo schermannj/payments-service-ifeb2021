@@ -1,11 +1,20 @@
 const Loki = require('lokijs');
+const moment = require('moment')
 
 const db = new Loki('payments.db');
 
 const payments = db.addCollection('payments');
 
 // autoincrement id
-payments.on('insert', (input) => Object.assign(input, { id: input.$loki }));
+payments.on('insert', (input) => Object.assign(input, {
+  id: input.$loki,
+  createdAt: moment.utc().toISOString(),
+  updatedAt: moment.utc().toISOString(),
+}));
+
+payments.on('update', (input) => Object.assign(input, {
+  updatedAt: moment.utc().toISOString(),
+}));
 
 if (!payments.data.length) {
   payments.insert({

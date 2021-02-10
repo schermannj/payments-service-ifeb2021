@@ -56,7 +56,11 @@ class PaymentsService {
    * @returns payment
    */
   create(payment) {
-    return this.db.payments.insert(payment);
+    return this.db.payments.insert({
+      ...payment,
+      isImported: false,
+      isDeleted: false,
+    });
   }
 
   /**
