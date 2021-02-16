@@ -1,5 +1,5 @@
 const Loki = require('lokijs');
-const moment = require('moment')
+const moment = require('moment');
 
 const db = new Loki('payments.db');
 
